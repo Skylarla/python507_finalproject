@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Recommendation System</title>
+</head>
+<body>
+    <h2>Welcome to the Restaurant Recommendation System</h2>
+    <form action="/recommendations" method="get">
+        <label for="cuisine">Cuisine:</label>
+        <input type="text" id="cuisine" name="cuisine"><br><br>
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location"><br><br>
+        <label for="price">Price (1-4):</label>
+        <input type="number" id="price" name="price" min="1" max="4"><br><br>
+        <input type="submit" value="Get Recommendations">
+    </form>
+</body>
+</html>
+
