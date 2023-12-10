@@ -2,11 +2,26 @@
 <html>
 <head>
     <title>Restaurant Recommendations</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <style>
         .restaurant {
             border: 1px solid #ddd;
             padding: 10px;
             margin-bottom: 10px;
+        }
+        #network-graph {
+            width: 1200px;
+            height: 800px;
+            border: 1.5px solid red; 
+        }
+        .node {
+            fill: #42a5f5;
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
         }
     </style>
 </head>
@@ -17,5 +32,109 @@
         <p>{{ restaurant['location']['address1'] }}</p>
     </div>
     {% endfor %}
+
+
+    <div id="network-graph"></div>
+
+
+    <script>
+        fetch('/get_restaurants_data')
+            .then(response => response.json())
+            .then(data => {
+                const graphData = buildGraphData(data);
+                drawGraph(graphData);
+            })
+            .catch(error => console.error('Error:', error));
+
+
+        function buildGraphData(restaurants) {
+            let nodes = restaurants.map(r => {
+                return { id: r.id, label: r.name, rating: r.rating };
+            });
+
+            let edges = [];
+
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const source = nodes[i];
+                    const target = nodes[j];
+                    const ratingDifference = Math.abs(source.rating - target.rating);
+
+                    if (ratingDifference <= 0.8) {
+                        // Filter out connections with a rating difference greater than 0.8
+                        edges.push({ source: source.id, target: target.id, ratingDifference: ratingDifference });
+                    }
+                }
+            }
+
+            return { nodes: nodes, edges: edges };
+        }
+
+
+        function drawGraph(graphData) {
+            const width = 1200, height = 800;
+            const svg = d3.select("#network-graph").append("svg")
+                          .attr("width", width)
+                          .attr("height", height);
+
+            const simulation = d3.forceSimulation(graphData.nodes)
+                .force("link", d3.forceLink(graphData.edges).id(d => d.id).distance(d => 300 - d.ratingDifference * 100)) // Adjust the distance calculation as needed
+                .force("charge", d3.forceManyBody())
+                .force("center", d3.forceCenter(width / 2, height / 2));
+
+            // Define a custom distance function based on rating difference
+            function customDistance(ratingDifference) {
+                // Adjust these values as needed to control the distance between nodes
+                const baseDistance = 100; // The base distance between nodes
+                const distanceMultiplier = 10; // Adjust this multiplier to control the exaggeration
+                
+                return baseDistance + ratingDifference * distanceMultiplier;
+            }
+
+            const link = svg.append("g")
+                            .selectAll("line")
+                            .data(graphData.edges)
+                            .enter().append("line")
+                            .attr("class", "link");
+
+            const node = svg.append("g")
+                            .selectAll("circle")
+                            .data(graphData.nodes)
+                            .enter().append("circle")
+                            .attr("class", "node")
+                            .attr("r", 5);
+
+            const labels = svg.append("g")
+                      .attr("class", "labels")
+                      .selectAll("text")
+                      .data(graphData.nodes)
+                      .enter().append("text")
+                      .attr("dx", 12)
+                      .attr("dy", ".35em")
+                      .text(d => `${d.label} (${d.rating})`);
+
+            simulation.on("tick", () => {
+                link.attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node.attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+
+                labels.attr("x", d => d.x)
+                      .attr("y", d => d.y);
+            });
+        }
+        
+        const restaurantsData = {{ recommendations | tojson }};
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const graphData = buildGraphData(restaurantsData);
+            drawGraph(graphData);
+        });
+
+    </script>
 </body>
 </html>
