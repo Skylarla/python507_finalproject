@@ -55,7 +55,7 @@ def get_recommendations():
         return render_template('recommendations.html', recommendations=cache.get(cache_key), source='cache')
 
     headers = {'Authorization': f'Bearer {YELP_API_KEY}'}
-    params = {'term': cuisine, 'location': location, 'price': price, 'limit': 5}
+    params = {'term': cuisine, 'location': location, 'price': price, 'limit': 6}
 
     response = requests.get(YELP_URL, headers=headers, params=params)
     if response.status_code == 200:
