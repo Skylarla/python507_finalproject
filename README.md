@@ -22,9 +22,6 @@ This Flask application serves as a web interface for a Restaurant Recommendation
 3. **API Keys and Configuration**:
 -  This application does not require you to configure the API key, because I have already configured it in the code in advance.
 
-## Running the Application
-- To run the application, use the following command from the project directory:
-
 ## Interacting with the Program
 - Once the application is running, open a web browser and navigate to http://127.0.0.1:5000.
 - Interact with the application through its web interface, which includes forms for entering your preferences like price range, preferred location, and cuisine type. Submit your preferences to get tailored restaurant recommendations.
