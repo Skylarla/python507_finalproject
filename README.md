@@ -25,3 +25,18 @@ This Flask application serves as a web interface for a Restaurant Recommendation
 ## Interacting with the Program
 - Once the application is running, open a web browser and navigate to http://127.0.0.1:5000.
 - Interact with the application through its web interface, which includes forms for entering your preferences like price range, preferred location, and cuisine type. Submit your preferences to get tailored restaurant recommendations.
+
+## Data Structure Overview
+- **Graph Structure**:
+  - Used to represent relationships between restaurants.
+  - Nodes represent restaurants; edges represent connections based on the rating of each restaurant. 
+
+## Data Representation
+- Data is stored in a JSON format and organized into the above data structures within the application.
+- The `restaurant_data.json` file contains raw restaurant data.
+
+## Utilization in the Application
+- Graphs are used to find related restaurants and suggest alternatives.
+
+## Additional Files
+- `restaurants_data.json`: cache file, it contains the raw restaurant data.
